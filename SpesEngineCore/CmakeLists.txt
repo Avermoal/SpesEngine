@@ -3,15 +3,19 @@ cmake_minimum_required(VERSION 4.0.1 FATAL_ERROR)
 set(ENGINE_PROJECT_NAME SpesEngineCore)
 
 set(ENGINE_PUBLIC_INCLUDES
-	includes/SpesEngineCore/test.h
+	includes/SpesEngineCore/Log.h
+	includes/SpesEngineCore/Application.h
 )
 
 set(ENGINE_PRIVATE_INCLUDES
-	includes/SpesEngineCore/test2.h
+	includes/SpesEngineCore/Window.h
+	includes/SpesEngineCore/ShaderProgram.h
 )
 
 set(ENGINE_PRIVATE_SOURCES
-	src/SpesEngineCore/test.c
+	src/SpesEngineCore/Application.c
+	src/SpesEngineCore/Window.c
+	src/SpesEngineCore/ShaderProgram.c
 )
 
 set(ENGINE_ALL_SOURCES

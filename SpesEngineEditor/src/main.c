@@ -1,9 +1,8 @@
-#include <SpesEngineCore/test.h>
-
+#include <SpesEngineCore/Application.h>
 
 int main(void) {
 
-	LOG_INFO("Я сошла с ума!");
+	enum APP_EXIT_CODE code = start_app();
 
-	return 0;
+	return code;
 }

@@ -10,12 +10,15 @@ set(ENGINE_PUBLIC_INCLUDES
 set(ENGINE_PRIVATE_INCLUDES
 	includes/SpesEngineCore/Window.h
 	includes/SpesEngineCore/ShaderProgram.h
+	includes/SpesEngineCore/Events.h
+	includes/SpesEngineCore/EventsData.h
 )
 
 set(ENGINE_PRIVATE_SOURCES
 	src/SpesEngineCore/Application.c
 	src/SpesEngineCore/Window.c
 	src/SpesEngineCore/ShaderProgram.c
+	src/SpesEngineCore/Events.c
 )
 
 set(ENGINE_ALL_SOURCES

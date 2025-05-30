@@ -7,6 +7,7 @@
 
 #include "SpesEngineCore/Log.h"
 #include "SpesEngineCore/ShaderProgram.h"
+#include "SpesEngineCore/Events.h"
 
 GLfloat point[] = {
 	0.0f, 0.5f, 0.0f,
@@ -29,8 +30,14 @@ struct Window* window_init(unsigned int width, unsigned int height, const char* 
 		LOG_INFO("GLFW not init");
 		return NULL;
 	}
-
-	pWindow->pWindow_ = glfwCreateWindow(width, height, title, NULL, NULL);
+	if (pWindow) {
+		pWindow->pWindow_ = glfwCreateWindow(width, height, title, NULL, NULL);
+	}
+	else {
+		LOG_INFO("[ERROR] Memmory allocation failed, window don't create");
+		glfwTerminate();
+		return NULL;
+	}
 
 	if (!pWindow->pWindow_) {
 		LOG_INFO("[WINDOW]: Window don't create\n");
@@ -46,20 +53,22 @@ struct Window* window_init(unsigned int width, unsigned int height, const char* 
 		return NULL;
 	}
 
-	pWindow->width_ = width;
-	pWindow->height_ = height;
-	pWindow->title_ = title;
+	pWindow->winData_.width_ = width;
+	pWindow->winData_.height_ = height;
+	pWindow->winData_.title_ = title;
+
+	glfwSetWindowUserPointer(pWindow->pWindow_, &pWindow->winData_);
 	
-	size_t vertex_shader_length = shader_length("C:\\Users\\Mikhail\\source\\repos\\SpesEngine\\res\\main.glslv");
-	size_t fragment_shader_length = shader_length("C:\\Users\\Mikhail\\source\\repos\\SpesEngine\\res\\main.glslf");
+	size_t vertex_shader_length = shader_length("../../res/main.glslv");
+	size_t fragment_shader_length = shader_length("../../res/main.glslf");
 	char* vertex_shader_src = calloc(vertex_shader_length, sizeof(char));
 	char* fragment_shader_src = calloc(fragment_shader_length, sizeof(char));
 
-	if (!load_shader("C:\\Users\\Mikhail\\source\\repos\\SpesEngine\\res\\main.glslv", vertex_shader_src, vertex_shader_length)) {
+	if (!load_shader("../../res/main.glslv", vertex_shader_src, vertex_shader_length)) {
 		window_terminate(pWindow);
 		return NULL;
 	}
-	if (!load_shader("C:\\Users\\Mikhail\\source\\repos\\SpesEngine\\res\\main.glslf", fragment_shader_src, fragment_shader_length)) {
+	if (!load_shader("../../res/main.glslf", fragment_shader_src, fragment_shader_length)) {
 		window_terminate(pWindow);
 		return NULL;
 	}
@@ -117,17 +126,28 @@ void window_terminate(struct Window* window) {
 	glfwDestroyWindow(window->pWindow_);
 	glfwTerminate();
 	free(window);
+	window = NULL;
 }
 
 void on_update(struct Window* window) {
-	glClearColor(0.3f, 0.7f, 0.2f, 1.0f);
+	///glClearColor(0.3f, 0.7f, 0.2f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	bindShaderProgram(window->shader_program_id_);
 	glBindVertexArray(vao);
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 
+	if (jpressed(GLFW_KEY_TAB)) {
+		toogleCursor(window->pWindow_);
+	}
+	if (jclicked(GLFW_MOUSE_BUTTON_1)) {
+		glClearColor(0.2f, 0.1f, 0.5f, 1.f);
+	}
 
 	glfwSwapBuffers(window->pWindow_);
-	glfwPollEvents();
+	pullEvents();
+}
+
+void setCursorMode(GLFWwindow* pWindow, int mode) {
+	glfwSetInputMode(pWindow, GLFW_CURSOR, mode);
 }

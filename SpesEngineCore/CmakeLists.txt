@@ -7,11 +7,28 @@ set(ENGINE_PUBLIC_INCLUDES
 	includes/SpesEngineCore/Application.h
 )
 
+
+set (MATH_INCLUDES
+	includes/Mathemathics/vec3_float.h
+	includes/Mathemathics/mat4_float.h
+	includes/Mathemathics/some_func.h
+)
+
+set (MATH_SRC
+	src/Mathemathics/vec3_float.c
+	src/Mathemathics/mat4_float.c
+	src/Mathemathics/some_func.c
+)
+
+
 set(ENGINE_PRIVATE_INCLUDES
 	includes/SpesEngineCore/Window.h
 	includes/SpesEngineCore/ShaderProgram.h
 	includes/SpesEngineCore/Events.h
 	includes/SpesEngineCore/EventsData.h
+	includes/SpesEngineCore/Camera.h
+	
+	${MATH_INCLUDES}
 )
 
 set(ENGINE_PRIVATE_SOURCES
@@ -19,6 +36,9 @@ set(ENGINE_PRIVATE_SOURCES
 	src/SpesEngineCore/Window.c
 	src/SpesEngineCore/ShaderProgram.c
 	src/SpesEngineCore/Events.c
+	src/SpesEngineCore/Camera.c
+	
+	${MATH_SRC}
 )
 
 set(ENGINE_ALL_SOURCES
@@ -45,8 +65,6 @@ target_link_libraries(${ENGINE_PROJECT_NAME} PRIVATE glfw)
 add_subdirectory(../external/glad ${CMAKE_CURRENT_BINARY_DIR}/glad)
 target_link_libraries(${ENGINE_PROJECT_NAME} PRIVATE glad)
 
-add_subdirectory(../external/glm ${CMAKE_CURRENT_BINARY_DIR}/glm})
-target_link_libraries(${ENGINE_PROJECT_NAME} PUBLIC glm)
-
 add_subdirectory(../external/assimp ${CMAKE_CURRENT_BINARY_DIR}/assimp)
 target_link_libraries(${ENGINE_PROJECT_NAME} PRIVATE assimp)
+

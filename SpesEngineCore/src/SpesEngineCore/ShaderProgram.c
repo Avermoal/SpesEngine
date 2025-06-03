@@ -4,6 +4,9 @@
 
 #include "SpesEngineCore/Log.h"
 
+#include "Mathemathics/mat4_float.h"
+#include "Mathemathics/some_func.h"
+
 int load_shader(const char* relative_path, char* shader, size_t shader_length) {
 	FILE* shader_src = fopen(relative_path, "r");
 
@@ -72,6 +75,10 @@ struct ShaderProgram createShaderProgram(const char* vertex_shader, const char* 
 	return sh_p;
 }
 
+void destroyShaderProgram(GLuint id) {
+	glDeleteShader(id);
+}
+
 void bindShaderProgram(GLuint id) {
 	glUseProgram(id);
 }
@@ -88,4 +95,9 @@ size_t shader_length(const char* relative_path) {
 	fclose(shader);
 
 	return size;
+}
+
+void uniformMatrix(const char* name, struct mat4_float matrix, GLuint shader_program_id) {
+	GLuint transformLoc = glGetUniformLocation(shader_program_id, name);
+	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, mat4_float_value_ptr(matrix));
 }

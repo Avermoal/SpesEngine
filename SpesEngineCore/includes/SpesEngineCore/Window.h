@@ -4,6 +4,7 @@
 #include <stdbool.h>
 
 struct GLFWwindow;
+struct Camera;
 
 struct windowData {
 	unsigned int width_, height_;
@@ -14,6 +15,7 @@ struct windowData {
 
 struct Window {
 	struct GLFWwindow* pWindow_;
+	struct Camera* camera_;
 	struct windowData winData_;
 	unsigned int shader_program_id_;
 };

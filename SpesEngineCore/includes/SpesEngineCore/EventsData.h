@@ -4,15 +4,15 @@
 #include <stdbool.h>
 
 struct EventsData {
-	bool* keys_;
-	unsigned short* frames_;
-	unsigned short current_;
-	float deltaX_;
-	float deltaY_;
-	float x_;
-	float y_;
-	bool cursor_locked_;
-	bool cursor_started_;
+	bool* keys;
+	unsigned short* frames;
+	unsigned short current;
+	float deltaX;
+	float deltaY;
+	float x;
+	float y;
+	bool cursor_locked;
+	bool cursor_started;
 };
 
 static struct EventsData eventsData;

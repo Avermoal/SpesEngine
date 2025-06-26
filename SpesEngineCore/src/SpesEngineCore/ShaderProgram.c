@@ -7,7 +7,8 @@
 #include "Mathemathics/mat4_float.h"
 #include "Mathemathics/some_func.h"
 
-int load_shader(const char* relative_path, char* shader, size_t shader_length) {
+int load_shader(const char* relative_path, char* shader, size_t shader_length)
+{
 	FILE* shader_src = fopen(relative_path, "r");
 
 	if (!shader_src) {
@@ -21,7 +22,8 @@ int load_shader(const char* relative_path, char* shader, size_t shader_length) {
 	return 1;
 }
 
-struct ShaderProgram createShaderProgram(const char* vertex_shader, const char* fragment_shader) {
+struct ShaderProgram createShaderProgram(const char* vertex_shader, const char* fragment_shader)
+{
 	struct ShaderProgram sh_p;
 	
 	GLuint vertexShaderID, fragmentShaderID;
@@ -40,53 +42,57 @@ struct ShaderProgram createShaderProgram(const char* vertex_shader, const char* 
 	if (!success) {
 		glGetShaderInfoLog(vertexShaderID, 512, NULL, infoLog);
 		LOG_INFO("[ERROR] Vertex shader not compiled\n");
-		sh_p.id_ = 0;
-		sh_p.shader_compile_status_ = FAIL_TO_COMPILE_VERTEX_SHADER;
+		sh_p.id = 0;
+		sh_p.shader_compile_status = FAIL_TO_COMPILE_VERTEX_SHADER;
 		return sh_p;
 	}
 	glGetShaderiv(fragmentShaderID, GL_COMPILE_STATUS, &success);
 	if (!success) {
 		glGetShaderInfoLog(fragmentShaderID, 512, NULL, infoLog);
 		LOG_INFO("[ERROR] Fragment shader not compiled\n");
-		sh_p.id_ = 0;
-		sh_p.shader_compile_status_ = FAIL_TO_COMPILE_FRAGMENT_SHADER;
+		sh_p.id = 0;
+		sh_p.shader_compile_status = FAIL_TO_COMPILE_FRAGMENT_SHADER;
 		return sh_p;
 	}
 
-	sh_p.id_ = glCreateProgram();
+	sh_p.id = glCreateProgram();
 
-	glAttachShader(sh_p.id_, vertexShaderID);
-	glAttachShader(sh_p.id_, fragmentShaderID);
-	glLinkProgram(sh_p.id_);
+	glAttachShader(sh_p.id, vertexShaderID);
+	glAttachShader(sh_p.id, fragmentShaderID);
+	glLinkProgram(sh_p.id);
 
-	glDetachShader(sh_p.id_, vertexShaderID);
-	glDetachShader(sh_p.id_, fragmentShaderID);
+	glDetachShader(sh_p.id, vertexShaderID);
+	glDetachShader(sh_p.id, fragmentShaderID);
 	glDeleteShader(vertexShaderID);
 	glDeleteShader(fragmentShaderID);
 
-	glGetProgramiv(sh_p.id_, GL_LINK_STATUS, &success);
+	glGetProgramiv(sh_p.id, GL_LINK_STATUS, &success);
 	if (!success) {
-		glGetProgramInfoLog(sh_p.id_, 512, NULL, infoLog);
+		glGetProgramInfoLog(sh_p.id, 512, NULL, infoLog);
 		LOG_INFO("[ERROR] shader program not created\n");
-		sh_p.shader_compile_status_ = SHADER_PROGRAM_NOT_CREATED;
+		sh_p.shader_compile_status = SHADER_PROGRAM_NOT_CREATED;
 	}
 
-	sh_p.shader_compile_status_ = SUCCESS;
+	sh_p.shader_compile_status = SUCCESS;
 	return sh_p;
 }
 
-void destroyShaderProgram(GLuint id) {
+void destroyShaderProgram(GLuint id)
+{
 	glDeleteShader(id);
 }
 
-void bindShaderProgram(GLuint id) {
+void bindShaderProgram(GLuint id)
+{
 	glUseProgram(id);
 }
-void unbindShderProgram() {
+void unbindShderProgram()
+{
 	glUseProgram(0);
 }
 
-size_t shader_length(const char* relative_path) {
+size_t shader_length(const char* relative_path)
+{
 	FILE* shader = fopen(relative_path, "r");
 	
 	fseek(shader, 0L, SEEK_END);
@@ -97,7 +103,9 @@ size_t shader_length(const char* relative_path) {
 	return size;
 }
 
-void uniformMatrix(const char* name, struct mat4_float matrix, GLuint shader_program_id) {
-	GLuint transformLoc = glGetUniformLocation(shader_program_id, name);
-	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, mat4_float_value_ptr(matrix));
+
+void uniformMatrix(const char* name, struct mat4_float matrix, GLuint shader_program_id)
+{
+	GLuint loc = glGetUniformLocation(shader_program_id, name);
+	glUniformMatrix4fv(loc, 1, GL_FALSE, mat4_float_value_ptr(matrix));
 }

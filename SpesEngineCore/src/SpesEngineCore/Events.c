@@ -14,19 +14,20 @@
 #define MOUSE_BUTTONS 1024
 #define MAX_KEYS_NUMBER 1032
 
-void events_system_init(struct GLFWwindow* pWindow) {
-	eventsData.current_ = 0;
-	eventsData.deltaX_ = 0.f;
-	eventsData.deltaY_ = 0.f;
-	eventsData.x_ = 0.f;
-	eventsData.y_ = 0.f;
-	eventsData.cursor_locked_ = false;
-	eventsData.cursor_started_ = false;
+void events_system_init(struct GLFWwindow* pWindow)
+{
+	eventsData.current = 0;
+	eventsData.deltaX = 0.f;
+	eventsData.deltaY = 0.f;
+	eventsData.x = 0.f;
+	eventsData.y = 0.f;
+	eventsData.cursor_locked = false;
+	eventsData.cursor_started = false;
 
-	eventsData.keys_ = calloc(MAX_KEYS_NUMBER, sizeof(bool));
-	eventsData.frames_ = calloc(MAX_KEYS_NUMBER, sizeof(unsigned short));
+	eventsData.keys = calloc(MAX_KEYS_NUMBER, sizeof(bool));
+	eventsData.frames = calloc(MAX_KEYS_NUMBER, sizeof(unsigned short));
 
-	if (eventsData.keys_ == NULL || eventsData.frames_ == NULL) {
+	if (eventsData.keys == NULL || eventsData.frames == NULL) {
 		LOG_INFO("[EVENT SYSTEM ERROR] Can not allocate memmory\n");
 		return;
 	}
@@ -38,18 +39,19 @@ void events_system_init(struct GLFWwindow* pWindow) {
 	glfwSetCursorPosCallback(pWindow, cursor_position_callback);
 }
 
-void events_system_terminate() {
-	free(eventsData.keys_);
-	free(eventsData.frames_);
-	eventsData.keys_ = NULL;
-	eventsData.frames_ = NULL;
+void events_system_terminate()
+{
+	free(eventsData.keys);
+	free(eventsData.frames);
+	eventsData.keys = NULL;
+	eventsData.frames = NULL;
 }
 
-void pullEvents() {
-	++eventsData.current_;
-	LOG_INFO("%d\n", eventsData.current_);
-	eventsData.deltaX_ = 0.f;
-	eventsData.deltaY_ = 0.f;
+void pullEvents()
+{
+	++eventsData.current;
+	eventsData.deltaX = 0.f;
+	eventsData.deltaY = 0.f;
 	glfwPollEvents();
 }
 
@@ -57,78 +59,87 @@ void window_size_callback(struct GLFWwindow* pWindow, int width, int height) {
 	glViewport(0, 0, width, height);
 
 	struct windowData* winData = (struct windowData*)glfwGetWindowUserPointer(pWindow);
-	winData->width_ = width;
-	winData->height_ = height;
+	winData->width = width;
+	winData->height = height;
 }
 
-void window_close_callback(struct GLFWwindow* pWindow) {
+void window_close_callback(struct GLFWwindow* pWindow)
+{
 	struct windowData* winData = (struct windowData*)glfwGetWindowUserPointer(pWindow);
-	winData->window_should_not_close_ = false;
+	winData->window_should_not_close = false;
 }
 
-void cursor_position_callback(struct GLFWwindow* window, double xpos, double ypos) {
-	if (eventsData.cursor_locked_) {
-		eventsData.deltaX_ += xpos - eventsData.x_;
-		eventsData.deltaY_ += ypos - eventsData.y_;
+void cursor_position_callback(struct GLFWwindow* window, double xpos, double ypos)
+{
+	if (eventsData.cursor_locked) {
+		eventsData.deltaX += xpos - eventsData.x;
+		eventsData.deltaY += ypos - eventsData.y;
 	}
 	else {
-		eventsData.cursor_started_ = true;
+		eventsData.cursor_started = true;
 	}
-	eventsData.x_ = xpos;
-	eventsData.y_ = ypos;
+	eventsData.x = xpos;
+	eventsData.y = ypos;
 }
 
-void mouse_button_callback(struct GLFWwindow* window, int button, int action, int mode) {
+void mouse_button_callback(struct GLFWwindow* window, int button, int action, int mode)
+{
 	if (action == GLFW_PRESS) {
-		eventsData.keys_[button + MOUSE_BUTTONS] = true;
-		eventsData.frames_[button + MOUSE_BUTTONS] = eventsData.current_;
+		eventsData.keys[button + MOUSE_BUTTONS] = true;
+		eventsData.frames[button + MOUSE_BUTTONS] = eventsData.current;
 	}
 	else if (action == GLFW_RELEASE) {
-		eventsData.keys_[button + MOUSE_BUTTONS] = false;
-		eventsData.frames_[button + MOUSE_BUTTONS] = eventsData.current_;
+		eventsData.keys[button + MOUSE_BUTTONS] = false;
+		eventsData.frames[button + MOUSE_BUTTONS] = eventsData.current;
 	}
 }
 
-void key_callback(struct GLFWwindow* window, int key, int scancode, int action, int mode) {
+void key_callback(struct GLFWwindow* window, int key, int scancode, int action, int mode)
+{
 	if (action == GLFW_PRESS) {
-		eventsData.keys_[key] = true;
-		eventsData.frames_[key] = eventsData.current_;
+		eventsData.keys[key] = true;
+		eventsData.frames[key] = eventsData.current;
 	}
 	else if (action == GLFW_RELEASE) {
-		eventsData.keys_[key] = false;
-		eventsData.frames_[key] = eventsData.current_;
+		eventsData.keys[key] = false;
+		eventsData.frames[key] = eventsData.current;
 	}
 }
 
-bool pressed(int keycode) {
+bool pressed(int keycode)
+{
 	if (keycode < 0 || keycode >= MOUSE_BUTTONS) {
 		return false;
 	}
-	return eventsData.keys_[keycode];
+	return eventsData.keys[keycode];
 }
 
-bool jpressed(int keycode) {
+bool jpressed(int keycode)
+{
 	if (keycode < 0 || keycode >= MOUSE_BUTTONS) {
 		return false;
 	}
-	return eventsData.keys_[keycode] && (eventsData.frames_[keycode] == eventsData.current_);
+	return eventsData.keys[keycode] && (eventsData.frames[keycode] == eventsData.current);
 }
 
-bool clicked(int button) {
+bool clicked(int button)
+{
 	if (button < 0 || (button + MOUSE_BUTTONS) >= MAX_KEYS_NUMBER) {
 		return false;
 	}
-	return eventsData.keys_[button + MOUSE_BUTTONS];
+	return eventsData.keys[button + MOUSE_BUTTONS];
 }
 
-bool jclicked(int button) {
+bool jclicked(int button)
+{
 	if (button < 0 || (button + MOUSE_BUTTONS) >= MAX_KEYS_NUMBER) {
 		return false;
 	}
-	return eventsData.keys_[button + MOUSE_BUTTONS] && (eventsData.frames_[button + MOUSE_BUTTONS] == eventsData.current_);
+	return eventsData.keys[button + MOUSE_BUTTONS] && (eventsData.frames[button + MOUSE_BUTTONS] == eventsData.current);
 }
 
-void toogleCursor(struct GLFWwindow* pWindow) {
-	eventsData.cursor_locked_ = !eventsData.cursor_locked_;
-	setCursorMode(pWindow, eventsData.cursor_locked_ ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+void toogleCursor(struct GLFWwindow* pWindow)
+{
+	eventsData.cursor_locked = !eventsData.cursor_locked;
+	setCursorMode(pWindow, eventsData.cursor_locked ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
 }

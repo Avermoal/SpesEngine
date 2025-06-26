@@ -4,20 +4,21 @@
 #include "SpesEngineCore/Window.h"
 #include "SpesEngineCore/Events.h"
 
-enum APP_EXIT_CODE start_app() {
-	struct Window* pWindow = window_init(500, 500, "Test Spes Engine");
-	if (!pWindow) {
+enum APP_EXIT_CODE start_app()
+{
+	struct Window window;
+
+  window_init(&window, 500, 500, "Test Spes Engine");
+	if (!window.pWindow) {
 		LOG_INFO("Window don't created\n");
 		return CRITICAL;
 	}
 
-	events_system_init(pWindow->pWindow_);
+	events_system_init(window.pWindow);
 
-	pWindow->winData_.window_should_not_close_ = true;
+	window.winData.window_should_not_close = true;
 
-	while (pWindow->winData_.window_should_not_close_) {
-		on_update(pWindow);
+	while (window.winData.window_should_not_close) {
+		on_update(&window);
 	}
-	free(pWindow);
-	pWindow = NULL;
 }

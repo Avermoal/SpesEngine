@@ -8,6 +8,7 @@
 #include "SpesEngineCore/Log.h"
 #include "SpesEngineCore/ShaderProgram.h"
 #include "SpesEngineCore/Events.h"
+#include "SpesEngineCore/EventsData.h"
 #include "SpesEngineCore/Camera.h"
 
 #include "Mathemathics/mat4_float.h"
@@ -36,40 +37,36 @@ struct mat4_float model = {
 GLuint vao;
 
 
-struct Window* window_init(unsigned int width, unsigned int height, const char* title) {
-	struct Window* pWindow = malloc(sizeof(struct Window));
+void window_init(struct Window *window, unsigned int width, unsigned int height, const char* title)
+{
 	if (!glfwInit()) {
 		LOG_INFO("GLFW not init");
-		return NULL;
 	}
-	if (pWindow) {
-		pWindow->pWindow_ = glfwCreateWindow(width, height, title, NULL, NULL);
+	if (window) {
+		window->pWindow = glfwCreateWindow(width, height, title, NULL, NULL);
 	}
 	else {
 		LOG_INFO("[ERROR] Memmory allocation failed, window don't create");
 		glfwTerminate();
-		return NULL;
 	}
 
-	if (!pWindow->pWindow_) {
+	if (!window->pWindow) {
 		LOG_INFO("[WINDOW]: Window don't create\n");
 		glfwTerminate();
-		return NULL;
 	}
 
-	glfwMakeContextCurrent(pWindow->pWindow_);
+	glfwMakeContextCurrent(window->pWindow);
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		LOG_INFO("GLAD not init");
-		window_terminate(pWindow);
-		return NULL;
+		window_terminate(window);
 	}
 
-	pWindow->winData_.width_ = width;
-	pWindow->winData_.height_ = height;
-	pWindow->winData_.title_ = title;
+	window->winData.width = width;
+	window->winData.height = height;
+	window->winData.title = title;
 
-	glfwSetWindowUserPointer(pWindow->pWindow_, &pWindow->winData_);
+	glfwSetWindowUserPointer(window->pWindow, &window->winData);
 	
 	size_t vertex_shader_length = shader_length("../../res/main.glslv");
 	size_t fragment_shader_length = shader_length("../../res/main.glslf");
@@ -77,34 +74,29 @@ struct Window* window_init(unsigned int width, unsigned int height, const char* 
 	char* fragment_shader_src = calloc(fragment_shader_length, sizeof(char));
 
 	if (!load_shader("../../res/main.glslv", vertex_shader_src, vertex_shader_length)) {
-		window_terminate(pWindow);
-		return NULL;
+		window_terminate(window);
 	}
 	if (!load_shader("../../res/main.glslf", fragment_shader_src, fragment_shader_length)) {
-		window_terminate(pWindow);
-		return NULL;
+		window_terminate(window);
 	}
 	
 	struct ShaderProgram sh_p = createShaderProgram(vertex_shader_src, fragment_shader_src);
 	free(vertex_shader_src);
 	free(fragment_shader_src);
 
-	switch (sh_p.shader_compile_status_) {
+	switch (sh_p.shader_compile_status) {
 	case SHADER_PROGRAM_NOT_CREATED:
 		LOG_INFO("[SHADER PROGRAM] Shader program don't create\n");
-		window_terminate(pWindow);
-		return NULL;
+		window_terminate(window);
 	case FAIL_TO_COMPILE_VERTEX_SHADER:
 		LOG_INFO("[SHADER PROGRAM] Vertex shader don't compiled\n");
-		window_terminate(pWindow);
-		return NULL;
+		window_terminate(window);
 	case FAIL_TO_COMPILE_FRAGMENT_SHADER:
 		LOG_INFO("[SHADER PROGRAM] Fragment shader don't compiled\n");
-		window_terminate(pWindow);
-		return NULL;
+		window_terminate(window);
 	}
 
-	pWindow->shader_program_id_ = sh_p.id_;
+	window->shader_program_id = sh_p.id;
 
 
 	GLuint points_vbo = 0;
@@ -131,36 +123,34 @@ struct Window* window_init(unsigned int width, unsigned int height, const char* 
 	glViewport(0, 0, width, height);
 
 	struct vec3_float vecPos = { 0.f, 0.f, 3.f };
-	pWindow->camera_ = camera_init(vecPos, 90);
-
-	return pWindow;
+	camera_init(&window->camera, vecPos, 70.f);
 }
 
-void window_terminate(struct Window* window) {
-	camera_destroy(window->camera_);
-	destroyShaderProgram(window->shader_program_id_);
-	glfwDestroyWindow(window->pWindow_);
+void window_terminate(struct Window *window)
+{
+	destroyShaderProgram(window->shader_program_id);
+	glfwDestroyWindow(window->pWindow);
 	glfwTerminate();
-	free(window);
-	window = NULL;
 }
 
-void on_update(struct Window* window) {
+void on_update(struct Window *window)
+{
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
 
-	struct mat4_float projection = perspective(window->camera_->fov_, ((float)window->winData_.width_ / (float)window->winData_.height_), 0.1f, 1000.f);
-	struct mat4_float view = LookAt(window->camera_->cameraPos_, plus(window->camera_->cameraPos_,window->camera_->cameraFront_), window->camera_->cameraUp_);
-	bindShaderProgram(window->shader_program_id_);
-	uniformMatrix("model", model, window->shader_program_id_);
-	uniformMatrix("view", view, window->shader_program_id_);
-	uniformMatrix("projection", projection, window->shader_program_id_);
+	struct mat4_float projection = perspective(window->camera.fov, ((float)window->winData.width / (float)window->winData.height), 0.1f, 1000.f);
+	struct mat4_float view = LookAt(window->camera.cameraPos, plus(window->camera.cameraPos,window->camera.cameraFront), window->camera.cameraUp);
+
+	bindShaderProgram(window->shader_program_id);
+	uniformMatrix("model", model, window->shader_program_id);
+	uniformMatrix("view", view, window->shader_program_id);
+	uniformMatrix("projection", projection, window->shader_program_id);
 	glBindVertexArray(vao);
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 
 	if (jpressed(GLFW_KEY_TAB)) {
-		toogleCursor(window->pWindow_);
+		toogleCursor(window->pWindow);
 	}
 	if (jclicked(GLFW_MOUSE_BUTTON_1)) {
 		glClearColor(0.2f, 0.1f, 0.5f, 1.f);
@@ -169,22 +159,27 @@ void on_update(struct Window* window) {
 		glClearColor(0.4f, 0.7f, 0.2f, 1.f);
 	}
 	if (pressed(GLFW_KEY_W)) {
-		window->camera_->cameraPos_ = plus(window->camera_->cameraPos_, mult_by_numb(window->camera_->cameraFront_, 0.01f));
+		window->camera.cameraPos = plus(window->camera.cameraPos, mult_by_numb(window->camera.cameraFront, 0.001f));
 	}
 	if (pressed(GLFW_KEY_S)) {
-		window->camera_->cameraPos_ = minus(window->camera_->cameraPos_, mult_by_numb(window->camera_->cameraFront_, 0.01f));
+		window->camera.cameraPos = minus(window->camera.cameraPos, mult_by_numb(window->camera.cameraFront, 0.001f));
 	}
 	if (pressed(GLFW_KEY_D)) {
-		window->camera_->cameraPos_ = plus(window->camera_->cameraPos_, mult_by_numb(window->camera_->cameraRight_, 0.01f));
+		window->camera.cameraPos = plus(window->camera.cameraPos, mult_by_numb(window->camera.cameraRight, 0.001f));
 	}
 	if (pressed(GLFW_KEY_A)) {
-		window->camera_->cameraPos_ = minus(window->camera_->cameraPos_, mult_by_numb(window->camera_->cameraRight_, 0.01f));
+		window->camera.cameraPos = minus(window->camera.cameraPos, mult_by_numb(window->camera.cameraRight, 0.001f));
 	}
 
-	glfwSwapBuffers(window->pWindow_);
+	if (eventsData.cursor_locked) {
+		LOG_INFO("cursor is lokced\n");
+	}
+
+	glfwSwapBuffers(window->pWindow);
 	pullEvents();
 }
 
-void setCursorMode(GLFWwindow* pWindow, int mode) {
+void setCursorMode(GLFWwindow *pWindow, int mode)
+{
 	glfwSetInputMode(pWindow, GLFW_CURSOR, mode);
 }

@@ -11,3 +11,13 @@ struct mat4_float multiply_matrix(struct mat4_float m1, struct mat4_float m2) {
 
 	return res;
 }
+
+struct vec4_float mat4_by_vec4(struct mat4_float m, struct vec4_float v) {
+	struct vec4_float res = {
+		m.mat[0] * v.x + m.mat[1] * v.y + m.mat[2] * v.z + m.mat[3] * v.w,
+		m.mat[4] * v.x + m.mat[5] * v.y + m.mat[6] * v.z + m.mat[7] * v.w,
+		m.mat[8] * v.x + m.mat[9] * v.y + m.mat[10] * v.z + m.mat[11] * v.w,
+		m.mat[12] * v.x + m.mat[13] * v.y + m.mat[14] * v.z + m.mat[15] * v.w
+	};
+	return res;
+}

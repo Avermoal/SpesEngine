@@ -12,18 +12,9 @@ float dot(struct vec3_float vec1, struct vec3_float vec2) {
 }
 
 struct vec3_float normalize(struct vec3_float vec) {
-	float buffer = 1;
+	float norm = sqrtf(vec.x*vec.x + vec.y*vec.y + vec.z*vec.z);
 
-	if (fabs(vec.x) >= fabs(vec.y) && fabs(vec.x) >= fabs(vec.z)) {
-		buffer = fabs(vec.x);
-	}
-	if (fabs(vec.y) >= fabs(vec.x) && fabs(vec.y) >= fabs(vec.z)) {
-		buffer = fabs(vec.y);
-	}
-	if (fabs(vec.z) >= fabs(vec.y) && fabs(vec.z) >= fabs(vec.x)) {
-		buffer = fabs(vec.z);
-	}
-	struct vec3_float res = {vec.x/buffer, vec.y/buffer, vec.z/buffer};
+	struct vec3_float res = {vec.x/norm, vec.y/norm, vec.z/norm};
 	return res;
 }
 

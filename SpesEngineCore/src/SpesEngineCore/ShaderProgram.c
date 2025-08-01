@@ -22,7 +22,7 @@ int load_shader(const char* relative_path, char* shader, size_t shader_length)
 	return 1;
 }
 
-struct ShaderProgram createShaderProgram(const char* vertex_shader, const char* fragment_shader)
+struct ShaderProgram createShaderProgram(char* vertex_shader, char* fragment_shader)
 {
 	struct ShaderProgram sh_p;
 	
@@ -30,10 +30,10 @@ struct ShaderProgram createShaderProgram(const char* vertex_shader, const char* 
 	vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
 	fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
 
-	glShaderSource(vertexShaderID, 1, &vertex_shader, NULL);
+	glShaderSource(vertexShaderID, 1, (const GLchar * const *)&vertex_shader, NULL);
 	glCompileShader(vertexShaderID);
 
-	glShaderSource(fragmentShaderID, 1, &fragment_shader, NULL);
+	glShaderSource(fragmentShaderID, 1, (const GLchar * const *)&fragment_shader, NULL);
 	glCompileShader(fragmentShaderID);
 
 	GLint success;
@@ -104,8 +104,8 @@ size_t shader_length(const char* relative_path)
 }
 
 
-void uniformMatrix(const char* name, struct mat4_float matrix, GLuint shader_program_id)
+void uniformMatrix(char* name, struct mat4_float matrix, GLuint shader_program_id)
 {
-	GLuint loc = glGetUniformLocation(shader_program_id, name);
+	GLuint loc = glGetUniformLocation(shader_program_id, (const GLchar *)&name);
 	glUniformMatrix4fv(loc, 1, GL_FALSE, mat4_float_value_ptr(matrix));
 }

@@ -1,6 +1,8 @@
 #ifndef INCLUDES_SPES_ENGINE_CORE_SHADERPROGRAM_H
 #define INCLUDES_SPES_ENGINE_CORE_SHADERPROGRAM_H
 
+#include <stddef.h>
+
 #include <glad/glad.h>
 
 struct mat4_float;
@@ -17,7 +19,7 @@ struct ShaderProgram {
 
 int load_shader(const char* relative_path, char* shader, size_t shader_length);
 
-struct ShaderProgram createShaderProgram(const char* vertex_shader, const char* fragment_shader);
+struct ShaderProgram createShaderProgram(char* vertex_shader, char* fragment_shader);
 void destroyShaderProgram(GLuint id);
 
 void bindShaderProgram(GLuint id);
@@ -25,7 +27,7 @@ void unbindShderProgram();
 
 size_t shader_length(const char* relative_path);
 
-void uniformMatrix(const char* name, struct mat4_float matrix, GLuint shader_program_id);
+void uniformMatrix(char* name, struct mat4_float matrix, GLuint shader_program_id);
 
 
 #endif//INCLUDES_SPES_ENGINE_CORE_SHADERPROGRAM_H
